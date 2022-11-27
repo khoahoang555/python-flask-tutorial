@@ -1,39 +1,21 @@
-from flask import Flask, request
+
+from flask import Flask
+from flask_smorest import Api
+
+from resources.item import blp as ItemBlueprint
+from resources.store import blp as StoreBlueprint
 
 app = Flask(__name__)
 
-stores = [
-    {
-        "name": "My Store", 
-        "items": [
-            {
-                "name": "my item", 
-                "price": 15.99
-            }
-        ]
-    }
-]
+app.config["PROPAGATE_EXCEPTIONS"] = True
+app.config["API_TITLE"] = "Stores REST API"
+app.config["API_VERSION"] = "v1"
+app.config["OPENAPI_VERSION"] = "3.0.3"
+app.config["OPENAPI_URL_PREFIX"] = "/"
+app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
+app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 
-@app.route('/')
-def index():
-    a = 1
-    b = 2
-    z = sum(a, b)
-    return "hello"
+api = Api(app)
 
-@app.get("/store")
-def get_stores():
-    return {"stores": stores}
-
-@app.post("/store")
-def create_store():
-    request_data = request.get_json()
-    new_store = {"name": request_data["name"], "items": []}
-    stores.append(new_store)
-    return new_store, 201
-
-def sum(a, b):
-    return a + b
-
-if __name__ == "__main__":
-    app.run(debug = True)
+api.register_blueprint(ItemBlueprint)
+api.register_blueprint(StoreBlueprint)
